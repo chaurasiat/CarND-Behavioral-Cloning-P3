@@ -114,11 +114,11 @@ model.add(Dense(1))
 
 model.summary()
 model.compile(optimizer = "adam", loss = "mse")
-filepath='bestmodel.h5'
+filepath='bestmodelone.h5'
 checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
-early_stop = EarlyStopping(monitor='val_loss', patience=3, mode='min')
-callbacks_list = [checkpoint, early_stop]
-model.fit_generator(train_generator, samples_per_epoch= len(train_samples*6), validation_data=validation_generator, nb_val_samples=len(validation_samples), callbacks=callbacks_list ,nb_epoch=15)
+#early_stop = EarlyStopping(monitor='val_loss', patience=3, mode='min')
+callbacks_list = [checkpoint]
+model.fit_generator(train_generator, samples_per_epoch= len(train_samples*6), validation_data=validation_generator, nb_val_samples=len(validation_samples), callbacks=callbacks_list ,nb_epoch=5)
 
 #history_object=model.fit_generator(train_generator, samples_per_epoch= len(train_samples)*6, validation_data=validation_generator, nb_val_samples=len(validation_samples), nb_epoch=5)
 
