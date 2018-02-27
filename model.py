@@ -79,7 +79,7 @@ def generator(samples, batch_size=32,correctionFactor=0.2):
                 for image, measurement in zip(images, angles):
                     flipped_images.append(image)
                     flipped_angles.append(measurement)
-                    flipped_images.append(cv2.flip(image, 1))
+                    flipped_images.append(np.fliplr(image))
                     flipped_angles.append(measurement * -1.0)
 
                 X_train = np.array(flipped_images)
