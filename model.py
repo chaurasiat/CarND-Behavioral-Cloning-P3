@@ -19,10 +19,9 @@ with open("./data/driving_log.csv") as csvfile:
 
 lines=lines[1:]
 train_samples, validation_samples = train_test_split(lines, test_size=0.2)
-print("Length of Training Data: ",len(train_samples))
-print("Random datapoint - ",train_samples[9])
-print("Length of Validation Data: ",len(validation_samples))
-print("Random datapoint - ",validation_samples[9])
+print("Training Data Length: ",len(train_samples))
+print("Validation Data Length: ",len(validation_samples))
+
 
 
 #data generation and preprocessing
@@ -36,8 +35,6 @@ from keras.layers import Flatten, Dense, Lambda, Cropping2D, Dropout, ELU, MaxPo
 from keras.layers.convolutional import Convolution2D
 from keras.regularizers import l2
 from keras.optimizers import Adam
-from keras.callbacks import ModelCheckpoint
-from keras.callbacks import EarlyStopping
 
 def generator(samples, batch_size=32,correctionFactor=0.2):
     num_samples = len(samples)
@@ -114,22 +111,9 @@ model.add(Dense(1))
 
 model.summary()
 model.compile(optimizer = "adam", loss = "mse")
-filepath='bestmodelone.h5'
-checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
-#early_stop = EarlyStopping(monitor='val_loss', patience=3, mode='min')
-callbacks_list = [checkpoint]
-model.fit_generator(train_generator, samples_per_epoch= len(train_samples*6), validation_data=validation_generator, nb_val_samples=len(validation_samples), callbacks=callbacks_list ,nb_epoch=5)
+history_object=model.fit_generator(train_generator, samples_per_epoch= len(train_samples)*6, validation_data=validation_generator, nb_val_samples=len(validation_samples), nb_epoch=5)
 
-#history_object=model.fit_generator(train_generator, samples_per_epoch= len(train_samples)*6, validation_data=validation_generator, nb_val_samples=len(validation_samples), nb_epoch=5)
+model.save('model.h5')
 
-#model.save('bestmodel.h5')
-
-
-
-
-
-
-
-    
 
 
