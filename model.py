@@ -36,6 +36,8 @@ from keras.layers import Flatten, Dense, Lambda, Cropping2D, Dropout, ELU, MaxPo
 from keras.layers.convolutional import Convolution2D
 from keras.regularizers import l2
 from keras.optimizers import Adam
+from keras.callbacks import ModelCheckpoint
+from keras.callbacks import EarlyStopping
 
 def generator(samples, batch_size=32,correctionFactor=0.2):
     num_samples = len(samples)
@@ -112,9 +114,15 @@ model.add(Dense(1))
 
 model.summary()
 model.compile(optimizer = "adam", loss = "mse")
-history_object=model.fit_generator(train_generator, samples_per_epoch= len(train_samples)*6, validation_data=validation_generator, nb_val_samples=len(validation_samples), nb_epoch=5)
+filepath='bestmodel.h5'
+checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
+early_stop = EarlyStopping(monitor='val_loss', patience=3, mode='min')
+callbacks_list = [checkpoint, early_stop]
+model.fit_generator(train_generator, samples_per_epoch= len(train_samples*6), validation_data=validation_generator, nb_val_samples=len(validation_samples), callbacks=callbacks_list ,nb_epoch=15)
 
-model.save('model.h5')
+#history_object=model.fit_generator(train_generator, samples_per_epoch= len(train_samples)*6, validation_data=validation_generator, nb_val_samples=len(validation_samples), nb_epoch=5)
+
+#model.save('bestmodel.h5')
 
 
 
