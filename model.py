@@ -1,5 +1,5 @@
 import csv
-import cv2
+import matplotlib.image as mpimg
 import numpy as np
 import os
 from keras.models import Sequential
@@ -26,7 +26,7 @@ print("Random datapoint - ",validation_samples[9])
 
 
 #data generation and preprocessing
-import cv2
+
 import numpy as np
 from sklearn.utils import shuffle
 from matplotlib import pyplot as plt
@@ -50,20 +50,20 @@ def generator(samples, batch_size=32,correctionFactor=0.2):
 
                 #center
                 name ='./data/IMG/'+batch_sample[0].split('/')[-1]
-                center_image = cv2.imread(name)
-                center_image = cv2.cvtColor(center_image, cv2.COLOR_BGR2RGB)
+                center_image =mpimg.imread(name)
+                #center_image = cv2.cvtColor(center_image, cv2.COLOR_BGR2RGB)
                 centralAngle=float(batch_sample[3])
 
                 #left
                 name = './data/IMG/' + batch_sample[1].split('/')[-1]
-                left_image = cv2.imread(name)
-                left_image = cv2.cvtColor(left_image, cv2.COLOR_BGR2RGB)
+                left_image = mpimg.imread(name)
+                #left_image = cv2.cvtColor(left_image, cv2.COLOR_BGR2RGB)
                 left_angle = float(batch_sample[3]) + correctionFactor
 
                 #right
                 name = './data/IMG/' + batch_sample[2].split('/')[-1]
-                right_image = cv2.imread(name)
-                right_image = cv2.cvtColor(right_image, cv2.COLOR_BGR2RGB)
+                right_image = mpimg.imread(name)
+                #right_image = cv2.cvtColor(right_image, cv2.COLOR_BGR2RGB)
                 right_angle = float(batch_sample[3]) - correctionFactor
 
 
@@ -116,17 +116,6 @@ history_object=model.fit_generator(train_generator, samples_per_epoch= len(train
 
 model.save('model.h5')
 
-### print the keys contained in the history object
-print(history_object.history.keys())
-
-### plot the training and validation loss for each epoch
-plt.plot(history_object.history['loss'])
-plt.plot(history_object.history['val_loss'])
-plt.title('model mean squared error loss')
-plt.ylabel('mean squared error loss')
-plt.xlabel('epoch')
-plt.legend(['training set', 'validation set'], loc='upper right')
-plt.show()
 
 
 
