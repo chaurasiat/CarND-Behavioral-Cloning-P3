@@ -1,5 +1,6 @@
 import csv
 import matplotlib.image as mpimg
+import cv2
 import numpy as np
 import os
 from keras.models import Sequential
@@ -36,6 +37,26 @@ from keras.layers.convolutional import Convolution2D
 from keras.regularizers import l2
 from keras.optimizers import Adam
 
+def augment_brightness_camera_images(image):
+    '''
+    :param image: Input image
+    :return: output image with reduced brightness
+    '''
+
+    # convert to HSV so that its easy to adjust brightness
+    image1 = cv2.cvtColor(image,cv2.COLOR_RGB2HSV)
+
+    # randomly generate the brightness reduction factor
+    # Add a constant so that it prevents the image from being completely dark
+    random_bright = .25+np.random.uniform()
+
+    # Apply the brightness reduction to the V channel
+    image1[:,:,2] = image1[:,:,2]*random_bright
+
+    # convert to RBG again
+    image1 = cv2.cvtColor(image1,cv2.COLOR_HSV2RGB)
+    return image1
+
 def generator(samples, batch_size=32,correctionFactor=0.2):
     num_samples = len(samples)
     while 1: # Loop forever so the generator never terminates
@@ -51,18 +72,21 @@ def generator(samples, batch_size=32,correctionFactor=0.2):
                 name ='./data/IMG/'+batch_sample[0].split('/')[-1]
                 center_image =mpimg.imread(name)
                 #center_image = cv2.cvtColor(center_image, cv2.COLOR_BGR2RGB)
+                center_image=augment_brightness_camera_images(center_image)
                 centralAngle=float(batch_sample[3])
 
                 #left
                 name = './data/IMG/' + batch_sample[1].split('/')[-1]
                 left_image = mpimg.imread(name)
                 #left_image = cv2.cvtColor(left_image, cv2.COLOR_BGR2RGB)
+                left_image = augment_brightness_camera_images(left_image)
                 left_angle = float(batch_sample[3]) + correctionFactor
 
                 #right
                 name = './data/IMG/' + batch_sample[2].split('/')[-1]
                 right_image = mpimg.imread(name)
                 #right_image = cv2.cvtColor(right_image, cv2.COLOR_BGR2RGB)
+                right_image = augment_brightness_camera_images(right_image)
                 right_angle = float(batch_sample[3]) - correctionFactor
 
 
@@ -118,9 +142,11 @@ model.add(Convolution2D(24,5,5, subsample=(2,2), activation='relu'))
 model.add(Convolution2D(36,5,5, subsample=(2,2), activation='relu'))
 model.add(Convolution2D(48,5,5, subsample=(2,2), activation='relu'))
 model.add(Convolution2D(64,3,3, activation='relu'))
+model.add(Dropout(0.50))
 model.add(Convolution2D(64,3,3, activation='relu'))
 model.add(Flatten())
 model.add(Dense(100))
+model.add(Dropout(0.20))
 model.add(Dense(50))
 model.add(Dense(10))
 model.add(Dense(1))
@@ -129,7 +155,8 @@ model.summary()
 model.compile(optimizer = "adam", loss = "mse")
 history_object=model.fit_generator(train_generator, samples_per_epoch= len(train_samples)*6, validation_data=validation_generator, nb_val_samples=len(validation_samples), nb_epoch=3)
 
-model.save('nvidiamodel.h5')
+model.save('nvidiamodel1.h5')
+
 
 
 
